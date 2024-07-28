@@ -4,30 +4,35 @@ import Home from "./routes/home"
 import Profile from "./routes/profile"
 import Login from "./routes/login"
 import CreateAccount from "./routes/create-account"
-import { createGlobalStyle } from "styled-components"
+import styled, { createGlobalStyle } from "styled-components"
 import reset from "styled-reset"
 import { useEffect, useState } from "react"
 import LoadingScreen from "./components/loading-screen"
 import { auth } from "./firevase"
+import ProtectedRoute from "./components/protected-route"
 
 const router = createBrowserRouter([
   {
-    path:"/",
-    element: <Layout/>,
+    path: "/",
+    element: (
+      <ProtectedRoute> 
+        <Layout /> 
+      </ProtectedRoute>
+      ),
     children: [
       {
         path: "",
-        element: <Home/>
-      },{
+        element: <Home />
+      }, {
         path: "profile",
-        element: <Profile/>
+        element: <Profile />
       }
     ]
-  },{
+  }, {
     path: "/login",
-    element:<Login/>
-  },{
-    path: "/create-account", element:<CreateAccount/>
+    element: <Login />
+  }, {
+    path: "/create-account", element: <CreateAccount />
   }
 ])
 
@@ -43,20 +48,27 @@ const GlobalStyles = createGlobalStyle`
   }
 `;
 
+const Wrapper = styled.div`
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+`;
+
 function App() {
   const [isLoading, setIsLoading] = useState(true);
-  const init = async() => {
-    // setTimeout(()=> setIsLoading(false), 2000);
-    await auth.authStateReady();
+  const init = async () => {
+    await auth.authStateReady(); // 로그인 했는지 안했는지, 그리고 누구인지에 대한 정보 기다림
     setIsLoading(false);
   }
   useEffect(() => {
     init();
   }, []);
-  return <>
-    <GlobalStyles/>
-    {isLoading ? <LoadingScreen/> : <RouterProvider router={router}/> }
-  </>
+  return (
+    <Wrapper>
+      <GlobalStyles />
+      {isLoading ? <LoadingScreen /> : <RouterProvider router={router} />}
+    </Wrapper>
+  )
 }
 
-export default App
+export default App;
